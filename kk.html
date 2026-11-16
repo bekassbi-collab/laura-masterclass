@@ -250,7 +250,7 @@ section{padding:48px 0}
     var label=button.textContent;button.textContent="Жіберілуде…";
     var controller=new AbortController();
     var timeout=setTimeout(function(){controller.abort()},15000);
-    fetch("https://kaspi-telegram-leads.bekassbi.workers.dev/leads",{
+    fetch("https://laura-telegram-leads.bekassbi.workers.dev/leads",{
       method:"POST",headers:{"Content-Type":"application/json"},
       body:JSON.stringify({name:n,city:c,format:on.checked?"on":"off",source:src}),signal:controller.signal
     }).then(function(response){
