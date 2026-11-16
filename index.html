@@ -88,7 +88,7 @@ h2{font-size:clamp(30px,5vw,44px);margin-bottom:28px}
 .reg p.s{color:var(--mute);max-width:26em}
 form{background:var(--bg);border:2px solid var(--red);border-radius:20px;padding:26px;display:grid;gap:16px}
 label,legend{font-weight:700;font-size:15px}
-input[type=text]{width:100%;margin-top:6px;padding:14px;border:1.5px solid var(--line);border-radius:12px;font:inherit;background:var(--bg);color:var(--ink)}
+input[type=text],input[type=tel]{width:100%;margin-top:6px;padding:14px;border:1.5px solid var(--line);border-radius:12px;font:inherit;background:var(--bg);color:var(--ink)}
 fieldset{border:0;padding:0;margin:0;display:grid;gap:8px}
 .opt{display:flex;gap:10px;align-items:center;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;font-weight:600;cursor:pointer}
 .opt input{accent-color:var(--red);width:18px;height:18px}
@@ -194,6 +194,7 @@ section{padding:48px 0}
     </div>
     <form id="f" novalidate>
       <label>Атыңыз<input type="text" id="name" autocomplete="given-name" placeholder="Сізге қалай жүгінейік"></label>
+      <label>Телефон нөмірі (міндетті)<input type="tel" id="phone" name="phone" autocomplete="tel" placeholder="+7 700 123 45 67" maxlength="32" required></label>
       <label>Қала<input type="text" id="city" autocomplete="address-level2" placeholder="Мысалы, Алматы"></label>
       <fieldset id="fs">
         <legend>Қатысу форматын таңдаңыз</legend>
@@ -237,6 +238,8 @@ section{padding:48px 0}
   f.addEventListener("submit",function(e){
     e.preventDefault();err.textContent="";
     var n=name.value.trim(),c=city.value.trim();
+    var phoneInput=document.getElementById("phone"),rawPhone=phoneInput.value.trim(),phoneDigits=rawPhone.replace(/\D/g,"");
+    if(!/^\+?[0-9 ()-]+$/.test(rawPhone)||phoneDigits.length<10||phoneDigits.length>15){err.textContent="Телефон нөміріңізді дұрыс енгізіңіз.";phoneInput.focus();return}
     if(!n){err.textContent="Атыңызды жазыңыз.";name.focus();return}
     if(!c){err.textContent="Қалаңызды жазыңыз.";city.focus();return}
     if(!off.checked&&!on.checked){fs.classList.add("bad");err.textContent="Қатысу форматын таңдаңыз, онсыз тіркелу мүмкін емес.";return}
@@ -252,7 +255,7 @@ section{padding:48px 0}
     var timeout=setTimeout(function(){controller.abort()},15000);
     fetch("https://laura-telegram-leads.bekassbi.workers.dev/leads",{
       method:"POST",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({name:n,city:c,format:on.checked?"on":"off",source:src}),signal:controller.signal
+      body:JSON.stringify({name:n,city:c,phone:rawPhone,format:on.checked?"on":"off",source:"Телефон: "+rawPhone+" | "+src}),signal:controller.signal
     }).then(function(response){
       return response.json().then(function(data){
         if(!response.ok || !data.ok)throw new Error("delivery");
